@@ -1,0 +1,3 @@
+# ninja log v5
+2	28489	1661955233251614300	/home2/jayaram.reddy/deep_mpcvs/DeepMPCVS/flownet2_pytorch_official/flownet2_pytorch/networks/channelnorm_package/build/temp.linux-x86_64-cpython-37/channelnorm_cuda.o	20b42ebd3c9b7151
+3	53225	1661955257998864920	/home2/jayaram.reddy/deep_mpcvs/DeepMPCVS/flownet2_pytorch_official/flownet2_pytorch/networks/channelnorm_package/build/temp.linux-x86_64-cpython-37/channelnorm_kernel.o	f789ca3074e02

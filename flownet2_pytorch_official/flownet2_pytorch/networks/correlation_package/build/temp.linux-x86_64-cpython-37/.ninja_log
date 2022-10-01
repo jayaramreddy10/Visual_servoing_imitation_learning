@@ -1,0 +1,3 @@
+# ninja log v5
+2	24612	1661955298578276114	/home2/jayaram.reddy/deep_mpcvs/DeepMPCVS/flownet2_pytorch_official/flownet2_pytorch/networks/correlation_package/build/temp.linux-x86_64-cpython-37/correlation_cuda.o	2826892d102f23e7
+2	60539	1661955334507640434	/home2/jayaram.reddy/deep_mpcvs/DeepMPCVS/flownet2_pytorch_official/flownet2_pytorch/networks/correlation_package/build/temp.linux-x86_64-cpython-37/correlation_cuda_kernel.o	531e8b3e07610b40
