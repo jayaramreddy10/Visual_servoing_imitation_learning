@@ -3,22 +3,23 @@ import numpy as np
 
 class InteractionMatrix():
     def getData(self, f12, d1):
-        Cy = d1.shape[1] / 2
-        Cx = d1.shape[0] / 2 
-        ky = d1.shape[1] / 2
-        kx = d1.shape[0] / 2
+        #f12, d1 --> (384,512)
+        Cy = d1.shape[1] / 2    #256
+        Cx = d1.shape[0] / 2    #192
+        ky = d1.shape[1] / 2    #256
+        kx = d1.shape[0] / 2    #192
 
-        xyz = np.zeros([d1.shape[0],d1.shape[1],3])
-        Lsx = np.zeros([d1.shape[0],d1.shape[1],6])
-        Lsy = np.zeros([d1.shape[0],d1.shape[1],6])
+        xyz = np.zeros([d1.shape[0],d1.shape[1],3])   #(384,512,3)
+        Lsx = np.zeros([d1.shape[0],d1.shape[1],6])   #(384,512,6)
+        Lsy = np.zeros([d1.shape[0],d1.shape[1],6])   #(384,512,6)
         
         #d1 = d1/255.
 
-        med = np.median(d1)
+        med = np.median(d1)   #single value  -median of pixels of depth image
         for row in range(xyz.shape[0]):
             for col in range(xyz.shape[1]):
                 if(d1[row,col]==0):
-                    d1[row,col]= med
+                    d1[row,col]= med     #if any pixel val in depth image is 0, replace with median 
                 xyz[row,col,:] = [(col-Cx)/kx,(row-Cy)/ky,d1[row,col]]
                 Lsx[row,col,:] =[-1/xyz[row,col,2],0,xyz[row,col,0]/xyz[row,col,2],xyz[row,col,0]*xyz[row,col,1],
                     -(1+xyz[row,col,0]**2), xyz[row,col,1]]    

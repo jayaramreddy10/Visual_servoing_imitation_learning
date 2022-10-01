@@ -1,3 +1,4 @@
+from locale import normalize
 import os
 import random
 import math
@@ -21,20 +22,45 @@ from habitat_sim.utils.common import (
     quat_from_magnum,
     quat_to_magnum,
 )
+from habitat_sim.utils.data import ImageExtractor
 
 class HabitatEnv():
+    # For viewing the extractor output
+    def display_sample(sample):
+        img = sample["rgba"]
+        depth = sample["depth"]
+        semantic = sample["semantic"]
+
+        arr = [img, depth, semantic]
+        titles = ["rgba", "depth", "semantic"]
+        plt.figure(figsize=(12, 8))
+        for i, data in enumerate(arr):
+            ax = plt.subplot(1, 3, i + 1)
+            ax.axis("off")
+            ax.set_title(titles[i])
+            plt.imshow(data)
+        plt.show()
+
     def __init__(self, folder, init_state, depth_type):
-        scene_glb = folder + "/" + os.path.basename(folder).capitalize() + ".glb"
-        self._cfg = make_cfg(scene_glb)
+        #take a habitat scene and create configuration.
+
+        #scene_glb = folder + "/habitat-test-scenes/van-gogh-room.glb" 
+        scene_glb = folder + "/habitat_test_scenes/van-gogh-room.glb" 
+         #create habitat sim conf from (sim backend,agent) conf
+        self._cfg = make_cfg(scene_glb)    
+
+        #initialize agent state in sim after creating sim instance using sim conf in below init_common fn
         self.init_common(init_state)
         self.depth_type = depth_type
         agent_node = self._sim.agents[0].scene_node
-        self.agent_object_id = self._sim.add_object(1, agent_node)
-        self._sim.set_object_motion_type(
-            habitat_sim.physics.MotionType.KINEMATIC, self.agent_object_id
-        )
+        self.agent_object_id = self._sim.get_rigid_object_manager().add_object_by_template_id(1, agent_node)    #error here
+        self.agent_object_id.motion_type = habitat_sim.physics.MotionType.KINEMATIC
+        #self._sim.get_rigid_object_manager().set_object_motion_type(
+        #    habitat_sim.physics.MotionType.KINEMATIC, self.agent_object_id
+        #)
         assert (
-        self._sim.get_object_motion_type(self.agent_object_id)
+        #self._sim.get_rigid_object_manager().get_object_motion_type(self.agent_object_id)
+        self.agent_object_id.motion_type
         == habitat_sim.physics.MotionType.KINEMATIC
         )
         # Saving Start Frame
@@ -43,21 +69,22 @@ class HabitatEnv():
         self.save_depth_observation(observations, 0, 0, folder)
 
         self.noise = False
-        self.translation_noise = pickle.load(open("actuation_noise_fwd.pkl", 'rb'))
-        self.rotation_left_noise = pickle.load(open("actuation_noise_left.pkl", 'rb'))
-        self.rotation_right_noise = pickle.load(open("actuation_noise_right.pkl", 'rb'))
+        #self.translation_noise = pickle.load(open("actuation_noise_fwd.pkl", 'rb'))
+        #self.rotation_left_noise = pickle.load(open("actuation_noise_left.pkl", 'rb'))
+        #self.rotation_right_noise = pickle.load(open("actuation_noise_right.pkl", 'rb'))
        
     def init_common(self, init_state):
-        self._sim = habitat_sim.Simulator(self._cfg)
+        self._sim = habitat_sim.Simulator(self._cfg)    #create sim instance using conf of (agent + sim backend)
         random.seed(default_sim_settings["seed"])
         self._sim.seed(default_sim_settings["seed"])
-        start_state = self.init_agent_state(default_sim_settings["default_agent"], init_state)
+        start_state = self.init_agent_state(default_sim_settings["default_agent"], init_state)   #initialize agent state in sim 
         return start_state
         
     def init_agent_state(self, agent_id, init_state):
         start_state = habitat_sim.agent.AgentState()
         x, y, z, w, p, q, r = init_state
         start_state.position = np.array([x, y, z]).astype('float32')
+        #start_state.rotation = np.quaternion(w,p,q,r, normalize = True)
         start_state.rotation = np.quaternion(w,p,q,r)
         agent = self._sim.initialize_agent(agent_id, start_state)
         start_state = agent.get_state()
@@ -98,10 +125,11 @@ class HabitatEnv():
         return depth_img
 
     def agent_controller(self, agent, velocity):
-        vel_control = self._sim.get_object_velocity_control(self.agent_object_id)
+        vel_control = self.agent_object_id.velocity_control
+        #vel_control = self._sim.get_object_velocity_control(self.agent_object_id)     #not working
         print("Normal Velocity:", velocity)
         if self.noise:
-            '''
+            
             t_noise = self.translation_noise.sample()[0][0] # 1 x 3 []
             velocity[0] += t_noise[0]
             velocity[1] += t_noise[0]
@@ -120,7 +148,7 @@ class HabitatEnv():
             velocity[3] += (r_noise[1] - r_noise[2])
             velocity[4] += (r_noise[1] - r_noise[2])
             velocity[5] += (r_noise[1] - r_noise[2])
-            '''
+            
             noise = np.random.normal(0, 0.1, 6)
             velocity += noise
             #0.05, 0.1

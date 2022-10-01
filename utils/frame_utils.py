@@ -2,6 +2,7 @@ import numpy as np
 from os.path import *
 from imageio import imread
 from . import flow_utils 
+from PIL import Image
 
 def mse_(image_1, image_2):
 	imageA = np.asarray(image_1)
@@ -15,8 +16,11 @@ def read_gen(file_name):
     if ext == '.png' or ext == '.jpeg' or ext == '.ppm' or ext == '.jpg':
         im = imread(file_name)
         if im.shape[2] > 3:
-            return im[:,:,:3]
+            im = im[:,:,:3]
+            #im = Image.fromarray(im).resize((384,512))
+            return im
         else:
+            #im = Image.fromarray(im).resize((384,512))
             return im
     elif ext == '.bin' or ext == '.raw':
         return np.load(file_name)

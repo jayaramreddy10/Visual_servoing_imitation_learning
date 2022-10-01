@@ -89,7 +89,9 @@ habitat_sim.registry.register_move_fn(
 def make_cfg(scene):
     default_sim_settings["scene"] = scene
     settings = default_sim_settings
-    sim_cfg = hsim.SimulatorConfiguration()
+
+    #create habitat sim conf
+    sim_cfg = habitat_sim.SimulatorConfiguration()
     if "enable_physics" in settings.keys():
         sim_cfg.enable_physics = settings["enable_physics"]
     else:
@@ -99,22 +101,22 @@ def make_cfg(scene):
     print("sim_cfg.physics_config_file = " + sim_cfg.physics_config_file)
     sim_cfg.gpu_device_id = 0
     #print(settings["scene"])
-    sim_cfg.scene.id = settings["scene"]
+    sim_cfg.scene_id = settings["scene"]
 
     # define default sensor parameters (see src/esp/Sensor/Sensor.h)
     sensors = {
         "color_sensor": {  # active if sim_settings["color_sensor"]
-            "sensor_type": hsim.SensorType.COLOR,
+            "sensor_type": habitat_sim.SensorType.COLOR,
             "resolution": [settings["height"], settings["width"]],
             "position": [0.0, settings["sensor_height"], 0.0],
         },
         "depth_sensor": {  # active if sim_settings["depth_sensor"]
-            "sensor_type": hsim.SensorType.DEPTH,
+            "sensor_type": habitat_sim.SensorType.DEPTH,
             "resolution": [settings["height"], settings["width"]],
             "position": [0.0, settings["sensor_height"], 0.0],
         },
         "semantic_sensor": {  # active if sim_settings["semantic_sensor"]
-            "sensor_type": hsim.SensorType.SEMANTIC,
+            "sensor_type": habitat_sim.SensorType.SEMANTIC,
             "resolution": [settings["height"], settings["width"]],
             "position": [0.0, settings["sensor_height"], 0.0],
         },
@@ -124,7 +126,7 @@ def make_cfg(scene):
     sensor_specs = []
     for sensor_uuid, sensor_params in sensors.items():
         if settings[sensor_uuid]:
-            sensor_spec = hsim.SensorSpec()
+            sensor_spec = habitat_sim.CameraSensorSpec()    #visual sensor instance is created here
             sensor_spec.uuid = sensor_uuid
             sensor_spec.sensor_type = sensor_params["sensor_type"]
             sensor_spec.resolution = sensor_params["resolution"]
@@ -140,7 +142,7 @@ def make_cfg(scene):
             sensor_specs.append(sensor_spec)
 
     # create agent specifications
-    agent_cfg = habitat_sim.agent.AgentConfiguration()
+    agent_cfg = habitat_sim.agent.AgentConfiguration()   #create agent conf using above sensor specifications.
     agent_cfg.sensor_specifications = sensor_specs
     agent_cfg.action_space = {
         "move_forward": habitat_sim.agent.ActionSpec(
@@ -195,4 +197,4 @@ def make_cfg(scene):
             )
         }
 
-    return habitat_sim.Configuration(sim_cfg, [agent_cfg])
+    return habitat_sim.Configuration(sim_cfg, [agent_cfg])   #create habitat sim conf instance and return it
