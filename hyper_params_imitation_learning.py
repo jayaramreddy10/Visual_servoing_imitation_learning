@@ -18,11 +18,11 @@ class Hyper_params:
 h_params = Hyper_params(
 	batch_size = 16,
 	l_rate = 1e-4,
-    n_epochs = 2000,
+    n_epochs = 20,
     img_size_x = 384,
 	img_size_y = 512,
     n_features = 2048,
-	max_frames = 15
+	max_frames = 50
 )
 
 def hparams_debug_string():

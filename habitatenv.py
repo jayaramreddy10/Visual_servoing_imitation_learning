@@ -194,6 +194,37 @@ class HabitatEnv():
         elif self.depth_type == 'FLOW':
             return color_img, prev_color_img , depth_img
 
+    def example_generate_video(self, vel, frame=1,folder=''):
+        '''
+        vel : n x 6 velocity vector
+        '''
+        # vel[:, 2] = -vel[:, 2] # conventions Z axis
+        # vel[:, 1] = -vel[:, 1] # conventions Y axis
+
+        # vel[:, 5] = -vel[:, 5] # conventions Z axis
+        # vel[:, 4] = -vel[:, 4] # conventions Y axis
+        #vel[:, 0] = -vel[:, 0] # conventions
+
+        agent_id = default_sim_settings["default_agent"]
+        agent = self._sim._default_agent
+
+        color_img = None
+        depth_img = None
+        for i in range(vel.shape[0]):
+            state = agent.get_state()
+            self.agent_controller(agent, vel[i])
+            observations = self._sim.get_sensor_observations()
+            if self.depth_type == 'FLOW':
+                color_img , prev_color_img = self.save_color_observation(observations, frame, i + 1, folder)
+            elif self.depth_type == 'TRUE':
+                color_img = self.save_color_observation(observations, frame, i + 1, folder)
+            depth_img = None
+        
+        if self.depth_type == 'TRUE':
+            return color_img, depth_img
+        elif self.depth_type == 'FLOW':
+            return color_img, prev_color_img , depth_img
+
     def end_sim(self):
         self._sim.close()
         del self._sim

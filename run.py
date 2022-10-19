@@ -204,7 +204,7 @@ if __name__ == '__main__':
     main()
 
 #Run script:
-#/home/jayaram/mount_ada_node/deep_mpcvs/DeepMPCVS/test_image 0 0 0 0 0 0 1 1 1 0
-#/home2/jayaram.reddy/deep_mpcvs/DeepMPCVS/test_image 0 0 0 0 0 0 1 1 1 0
+#/home/jayaram/mount_ada_node/deep_mpcvs/DeepMPCVS/test_image 0.4 0.4 0.2 1 0 0 0 1 1 0
+#python run.py /home2/jayaram.reddy/deep_mpcvs/DeepMPCVS/test_image 0.4 0.4 0.2 1 0 0 0 1 1 0
 
 #Line
